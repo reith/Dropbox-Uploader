@@ -16,6 +16,7 @@ Please refer to the &lt;Wiki&gt;(https://github.com/andreafabrizi/Dropbox-Upload
 * Cross platform
 * Support for the official Dropbox API
 * No password required or stored
+* Simple step-by-step configuration wizard
 * Simple and chunked file upload
 * File and recursive directory download
 * File and recursive directory upload
@@ -34,7 +35,7 @@ git clone https://github.com/andreafabrizi/Dropbox-Uploader/
 or download the script manually using this command:
 
 ```bash
-curl "https://raw.github.com/andreafabrizi/Dropbox-Uploader/master/dropbox_uploader.sh" -o dropbox_uploader.sh
+curl "https://raw.githubusercontent.com/andreafabrizi/Dropbox-Uploader/master/dropbox_uploader.sh" -o dropbox_uploader.sh
 ```
 
 Then give the execution permission to the script and run it:
@@ -43,6 +44,12 @@ Then give the execution permission to the script and run it:
  $chmod +x dropbox_uploader.sh
  $./dropbox_uploader.sh
 ```
+
+The first time you run `dropbox_uploader`, you'll be guided through a wizard in order to configure access to your Dropbox. This configuration will be stored in `~/.dropbox_uploader`.
+
+### Configuration wizard
+
+The configuration wizard is pretty self-explanatory. One thing to notice is that if you choose "App permission", your uploads will end up on Dropbox under an `App/<your_app_name>` folder. To have them stored in another folder, such as in `/dir/`, you'll need to give Dropbox-Uploader permission to all Dropbox files.
 
 ## Usage
 
@@ -129,7 +136,7 @@ Doesn't check for SSL certificates (insecure)
 ## Tested Environments
 
 * GNU Linux
-* FreeBSD 8.3
+* FreeBSD 8.3/10.0
 * MacOSX
 * Windows/Cygwin
 * Raspberry Pi
@@ -146,7 +153,7 @@ Dropbox Uploader relies on a different configuration file for each system user. 
 So, when running this script using cron, please keep in mind the following:
 * Remember to setup the script with the user used to run the cron job
 * Use always the -f option to specify the full configuration file path, because sometimes in the cron environment the home folder path is not detected correctly
-* My advise is, for security reasons, to don't share the same configuration file with different users
+* My advice is, for security reasons, to not share the same configuration file with different users
 
 ## How to setup a proxy
 
@@ -184,6 +191,9 @@ To use a proxy server, just set the **https_proxy** environment variable:
 You need to install these packages:  
 * curl
 * ca-certificates
+* dos2unix
+
+Before running the script, you need to convert it using the dos2unix command.
 
 
 **Build cURL from source:**
