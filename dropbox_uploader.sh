@@ -58,7 +58,7 @@ APP_CREATE_URL="https://www.dropbox.com/developers/apps"
 RESPONSE_FILE="$TMP_DIR/du_resp_$RANDOM"
 CHUNK_FILE="$TMP_DIR/du_chunk_$RANDOM"
 TEMP_FILE="$TMP_DIR/du_tmp_$RANDOM"
-BIN_DEPS="sed basename date grep stat dd mkdir split"
+BIN_DEPS="sed basename date grep stat dd mkdir split ps"
 VERSION="0.14"
 
 umask 077
@@ -569,6 +569,7 @@ function db_chunked_upload_file
     local UPLOAD_ID=""
     local UPLOAD_ERROR=0
     local CHUNK_PARAMS=""
+    local RUNNING_CMD=""
 
     #Uploading chunks...
     if [ ! -z "$FILE_SRC" ]; then
@@ -590,8 +591,10 @@ function db_chunked_upload_file
          #Store new pipe data
          echo -n 0 > "$CHUNK_FILE.dat"
 
+         RUNNING_CMD=$(ps --no-headers -p $$ -o 'args')
+
          #Loop over chunks
-         split -b $(($CHUNK_SIZE*1024*1024)) --filter="cat >\"$CHUNK_FILE\"; sh \"$0\" _put_chunk \"$CHUNK_FILE\""
+         split -b $(($CHUNK_SIZE*1024*1024)) --filter="cat >\"$CHUNK_FILE\"; ${RUNNING_CMD%pipe *} _put_chunk \"$CHUNK_FILE\""
 
          #read upload_id for commit
          read -r OFFSET UPLOAD_ID <"$CHUNK_FILE.dat"
@@ -1224,11 +1227,11 @@ case $COMMAND in
 
     pipe)
 
-      if [[ $argnum < 1 ]]; then
+      if [[ $argnum -ne 1 ]]; then
           usage
       fi
-      
-      FILE_DST=$2
+
+      FILE_DST=$ARG1
 
       db_upload_file "" "/$FILE_DST"
 
@@ -1240,7 +1243,7 @@ case $COMMAND in
           echo "This command should only invoked internally"
       fi
 
-      CHUNK_FILE=$2
+      CHUNK_FILE=$ARG1
       read -r OFFSET UPLOAD_ID <"$CHUNK_FILE.dat"
 
       db_put_chunk
