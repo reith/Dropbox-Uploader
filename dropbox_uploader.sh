@@ -38,6 +38,7 @@ QUIET=0
 SHOW_PROGRESSBAR=0
 SKIP_EXISTING_FILES=0
 ERROR_STATUS=0
+INTERACTIVE=1
 
 #Don't edit these...
 API_REQUEST_TOKEN_URL="https://api.dropbox.com/1/oauth/request_token"
@@ -122,6 +123,14 @@ fi
 if [[ $CURL_BIN == "" ]]; then
     BIN_DEPS="$BIN_DEPS curl"
     CURL_BIN="curl"
+fi
+
+
+COMMAND=${@:$OPTIND:1}
+
+#Set command's features
+if [[ $COMMAND == "pipe" ]]; then
+    INTERACTIVE=0
 fi
 
 #Dependencies check
@@ -1100,6 +1109,12 @@ if [[ -e $CONFIG_FILE ]]; then
         ACCESS_LEVEL="dropbox"
     fi
 
+elif [[ $INTERACTIVE -ne 1 ]]; then
+
+    echo -e "\n No configuration file could be read." >&2
+    echo -e "\nEither run program without arguments to launch setup wizard or provide a configuration file by -f option." >&2
+    exit 1
+
 #NEW SETUP...
 else
 
@@ -1201,7 +1216,6 @@ fi
 #### START  ####
 ################
 
-COMMAND=${@:$OPTIND:1}
 ARG1=${@:$OPTIND+1:1}
 ARG2=${@:$OPTIND+2:1}
 
